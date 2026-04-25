@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+.venv/
+venv/
+env/
+
+edid/.test-tmp/
+
+# Keep this repository focused on the EDID tool.
+CLTDeviceSDK_Win_V1.7_2025.03.27/
+archive/
+issue-tracker/
+jc_proxy_tools/
+lmstudio_tool_agent/
+novastar/
+parameter_testing_tools/
+parameter_testing_tools-share.zip
+get_recv_param.py
+get_recv_params.py
