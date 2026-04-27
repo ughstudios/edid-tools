@@ -1,0 +1,61 @@
+name: Build and publish release
+
+on:
+  push:
+    tags:
+      - "v*"
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Windows redistributable
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        working-directory: edid
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || github.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: edid/pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install ".[build]"
+
+      - name: Run tests
+        run: python -B -m unittest discover -s tests
+
+      - name: Build redistributable
+        shell: pwsh
+        run: .\build_redistributable.ps1
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EDIDTools-windows-x64
+          path: edid/release/EDIDTools-windows-x64.zip
+          if-no-files-found: error
+
+      - name: Attach asset to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name || github.ref_name }}
+          files: edid/release/EDIDTools-windows-x64.zip
+

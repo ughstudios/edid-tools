@@ -9,13 +9,15 @@ Push-Location $ProjectDir
 try {
     python -m PyInstaller --noconfirm --clean .\EDIDTools.spec
 
+    Copy-Item -Path ".\xml" -Destination ".\dist\EDIDTools" -Recurse -Force
+
     New-Item -ItemType Directory -Path $ReleaseDir -Force | Out-Null
     New-Item -ItemType Directory -Path $ReleasePackageDir -Force | Out-Null
     Copy-Item -Path ".\dist\EDIDTools\*" -Destination $ReleasePackageDir -Recurse -Force
     if (Test-Path -LiteralPath $ArchivePath) {
         Remove-Item -LiteralPath $ArchivePath -Force
     }
-    tar -a -c -f $ArchivePath -C ".\dist" "EDIDTools"
+    Compress-Archive -Path ".\dist\EDIDTools" -DestinationPath $ArchivePath -Force
 
     Write-Host "Redistributable package created:"
     Write-Host $ArchivePath

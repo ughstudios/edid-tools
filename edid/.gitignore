@@ -14,7 +14,7 @@ env/
 .codex-test-tmp/
 build/
 dist/
-release/*/
+release/
 
 # Boot-time generated UI key modules (editable install)
 src/edid/ui_keys_generated.py
