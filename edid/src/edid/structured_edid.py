@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import IntEnum
 
-from .edid_data import EDID_BLOCK_SIZE, DisplayData, DisplayDataError
+from edid.edid_data import EDID_BLOCK_SIZE, DisplayData, DisplayDataError
 
 
 class CEADataBlockTag(IntEnum):

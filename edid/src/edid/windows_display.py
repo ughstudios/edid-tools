@@ -6,8 +6,8 @@ from ctypes import wintypes
 import os
 from typing import Any
 
-from .edid_data import DisplayData, DisplayDataError
-from .logging_utils import log_event, log_exception, log_notice
+from edid.edid_data import DisplayData, DisplayDataError
+from edid.logging_utils import log_event, log_exception, log_notice
 
 
 try:
@@ -299,6 +299,7 @@ def export_display_data(target: str, *, source: str = "active") -> DisplayData:
 
 
 def reset_display(target: str | None = None, *, dry_run: bool = False) -> list[DisplayInstance]:
+    """Remove Windows override/recovery data while preserving the active EDID cache."""
     require_windows()
     matches = find_display_instances(target)
     if not matches:
@@ -310,7 +311,6 @@ def reset_display(target: str | None = None, *, dry_run: bool = False) -> list[D
         try:
             with _open_hklm(params_path, _write_access()) as key:
                 _delete_tree(key, "EDID_OVERRIDE")
-                _delete_value(key, "EDID")
                 _delete_tree(key, "EDID_RECOVERY")
         except FileNotFoundError as exc:
             log_notice("Display parameters key not found while resetting display", path=params_path, error=exc)
@@ -333,6 +333,7 @@ def delete_display_instance(target: str, *, dry_run: bool = False) -> DisplayIns
         display = matches[0]
     if dry_run:
         return display
+    _guard_active_edid_instance(display, action="delete monitor registry instance")
     device_path = fr"{ENUM_DISPLAY}\{display.device_id}"
     full_path = fr"{device_path}\{display.instance_id}"
     try:
@@ -354,6 +355,15 @@ def delete_display_instance(target: str, *, dry_run: bool = False) -> DisplayIns
             f"Administrator: {is_admin()}"
         ) from exc
     return display
+
+
+def _guard_active_edid_instance(display: DisplayInstance, *, action: str) -> None:
+    if not display.has_active_edid:
+        return
+    raise WindowsDisplayError(
+        f"Refusing to {action} for active display {display.key}. "
+        "The active monitor EDID cache must be preserved; remove overrides/recovery data instead."
+    )
 
 
 def diagnose_display_instance_permissions(display: DisplayInstance) -> str:
@@ -567,6 +577,8 @@ def _key_64() -> int:
 
 
 def _delete_value(key: Any, name: str) -> bool:
+    if name.upper() == "EDID":
+        raise WindowsDisplayError("Refusing to delete the active EDID registry value.")
     try:
         winreg.DeleteValue(key, name)
         return True

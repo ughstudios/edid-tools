@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from math import gcd
 
-from .edid_data import DisplayData
-from .structured_edid import DetailedTiming, MonitorDescriptor, StructuredEDID
+from edid.edid_data import DisplayData
+from edid.structured_edid import DetailedTiming, MonitorDescriptor, StructuredEDID
 
 
 ESTABLISHED_DMT = {
@@ -27,7 +27,7 @@ def decode_display_data(display_data: DisplayData, *, include_hex: bool = True) 
     if display_data.is_edid:
         return decode_edid(display_data, include_hex=include_hex)
     if display_data.is_displayid:
-        from .displayid import DisplayIDDocument
+        from edid.displayid import DisplayIDDocument
 
         return "\n".join(DisplayIDDocument.parse(display_data).summary_lines())
     return "\n".join(display_data.summary_lines())
@@ -156,7 +156,7 @@ def _digital_interface_name(value: int | None) -> str:
 
 
 def _established_lines(data: bytes) -> list[str]:
-    from .resolutions import EstablishedTimingSet
+    from edid.resolutions import EstablishedTimingSet
 
     timing_set = EstablishedTimingSet(data)
     lines = []
@@ -196,10 +196,7 @@ def _descriptor_lines(descriptor: MonitorDescriptor, failures: list[str]) -> lis
     raw = descriptor.raw
     if descriptor.tag == 0xFD and len(raw) >= 18:
         min_v, max_v, min_h, max_h, max_clock = raw[5], raw[6], raw[7], raw[8], raw[9] * 10
-        if raw[10] == 0x00:
-            failures.append(f"Display Range Limits: Byte 11 is 0x{raw[10]:02x} instead of 0x0a.")
-        if raw[11:18] != b" " * 7:
-            failures.append("Display Range Limits: Bytes 12-17 must be 0x20.")
+        failures.extend(_range_limit_failures(raw))
         return [
             "    Display Range Limits:",
             f"      Monitor ranges: {min_v}-{max_v} Hz V, {min_h}-{max_h} kHz H, max dotclock {max_clock} MHz",
@@ -213,3 +210,23 @@ def _descriptor_lines(descriptor: MonitorDescriptor, failures: list[str]) -> lis
     if raw and raw != bytes(18):
         return [f"    {descriptor.name}: {raw.hex(' ')}"]
     return []
+
+
+def _range_limit_failures(raw: bytes) -> list[str]:
+    timing_type = raw[10]
+    if timing_type in {0x00, 0x01}:
+        failures = []
+        if raw[11] != 0x0A:
+            failures.append(f"Display Range Limits: Byte 11 is 0x{raw[11]:02x} instead of 0x0a.")
+        if raw[12:18] != b" " * 6:
+            failures.append("Display Range Limits: Bytes 12-17 must be 0x20.")
+        return failures
+    if timing_type == 0x02:
+        if raw[11] != 0x00:
+            return [f"Display Range Limits: Secondary GTF reserved byte is 0x{raw[11]:02x} instead of 0x00."]
+        return []
+    if timing_type == 0x04:
+        return []
+    if timing_type == 0x0A and raw[11:18] == b" " * 7:
+        return []
+    return [f"Display Range Limits: Unsupported timing information type 0x{timing_type:02x}."]

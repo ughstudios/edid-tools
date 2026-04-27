@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+.venv/
+venv/
+env/
+
+.test-tmp/
+.codex-test-tmp/
+build/
+dist/
+release/*/
+
+# Boot-time generated UI key modules (editable install)
+src/edid/ui_keys_generated.py
+src/edid/ui_keys_generated.meta.json
+src/edid/ui_keys_generated.meta.json.*.tmp
+src/edid/ui/.ui_keys_write_probe*
+src/edid/ui/*.tmp
+src/edid/_pptx_extract.txt

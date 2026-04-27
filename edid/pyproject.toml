@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edid-tools"
+version = "0.1.0"
+description = "Python EDID, DisplayID, and Windows display override tools."
+readme = "README_PYTHON_TOOLS.md"
+requires-python = ">=3.10"
+dependencies = [
+    "PySide6>=6.6",
+]
+
+[project.scripts]
+edid-tools = "edid.cli:main"
+
+[project.optional-dependencies]
+build = [
+    "pyinstaller>=6",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["edid*"]

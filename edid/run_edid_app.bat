@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-set "APP_DIR=%~dp0edid"
+set "APP_DIR=%~dp0"
 
 if not exist "%APP_DIR%\edid_tools.py" (
     echo Could not find edid_tools.py in "%APP_DIR%".

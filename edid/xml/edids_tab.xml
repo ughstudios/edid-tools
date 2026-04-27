@@ -1,0 +1,51 @@
+<vbox name="edids_layout">
+  <QLabel name="edids_intro" wordWrap="true" text="Pull from a monitor into the library list below, then use the right pane (Decoded / Raw) for the selected row. Create new profile… opens the wizard in its own window." />
+  <QLabel name="edids_poll_status_label" objectName="hintLabel" wordWrap="true" text="Polling watches for monitor changes. Use Pull active / Pull override to snapshot into the library." />
+  <QLabel name="edids_context_banner" objectName="hintLabel" wordWrap="true" text="" />
+  <splitter name="edids_body_splitter" orientation="horizontal" stretch="1" sizes="420,520" tooltip="Drag the divider: library (readbacks + files) and profile details.">
+    <QGroupBox name="edids_library_group" title="EDID library" stretch="1">
+      <vbox name="edids_library_layout">
+        <QLabel name="edids_library_hint" objectName="hintLabel" wordWrap="true" text="Imports, wizard profiles, and readbacks from monitors live in one list. Choose the output above before Pull or override actions." />
+        <hbox name="manager_toolbar" stretch="0">
+          <QLabel text="Monitor:" />
+          <QComboBox name="manager_selected_combo" stretch="1" />
+          <QPushButton name="manager_refresh_button" text="Refresh" icon="SP_BrowserReload" tooltip="Reload the monitor list and refresh snapshots in the library." />
+        </hbox>
+        <hbox name="edids_display_read_buttons">
+          <QPushButton name="edids_read_active_button" text="Pull active data" icon="SP_ComputerIcon" tooltip="Copy into the library what Windows is using now from the display chain (effective view). Select the new row on the right to decode." />
+          <QPushButton name="edids_read_override_button" text="Pull registry override" icon="SP_DriveHDIcon" tooltip="If a Windows EDID override is installed for this monitor, copy that registry layer into the library." />
+        </hbox>
+        <QListWidget name="edids_list" stretch="1" tooltip="Reusable EDID binaries: imports, wizard-created profiles, and monitor readbacks (hover a row for details)." />
+        <hbox name="edids_import_buttons">
+          <QPushButton name="edids_import_button" text="Import…" icon="SP_DialogOpenButton" tooltip="Import BIN, DAT, TXT, or INF into the library." />
+          <QPushButton name="edids_create_button" text="Create new profile…" icon="SP_FileDialogNewFolder" tooltip="Open the EDID creation wizard in a separate window and save the result to the library." />
+          <QPushButton name="edids_duplicate_button" text="Duplicate" icon="SP_FileDialogDetailedView" tooltip="Duplicate the selected library entry before editing." />
+        </hbox>
+        <hbox name="edids_manage_buttons">
+          <QPushButton name="edids_rename_button" text="Rename" icon="SP_FileDialogContentsView" tooltip="Rename the selected library entry." />
+          <QPushButton name="edids_delete_button" text="Delete" icon="SP_TrashIcon" tooltip="Delete the selected entry from local storage." />
+          <QPushButton name="edids_export_button" text="Export…" icon="SP_DialogSaveButton" tooltip="Export the highlighted entry to BIN, DAT, TXT, or INF." />
+          <QPushButton name="manager_edit_button" text="Open advanced editor…" icon="SP_FileDialogContentsView" tooltip="Typed editors for the selected monitor's working copy (timings, blocks, product fields)." />
+          <stretch />
+        </hbox>
+      </vbox>
+    </QGroupBox>
+    <QGroupBox name="edids_selected_group" title="Selected profile" stretch="2">
+      <vbox name="edids_selected_layout">
+        <QLabel name="edids_selected_label" wordWrap="true" text="No profile selected." />
+        <tabs name="edids_preview_tabs" stretch="1">
+          <tab name="edids_decoded_tab" title="Decoded">
+            <vbox name="edids_decoded_layout">
+              <QPlainTextEdit name="edids_decoded_box" readonly="true" placeholder="Human-readable decode of the highlighted file." />
+            </vbox>
+          </tab>
+          <tab name="edids_raw_tab" title="Raw hex">
+            <vbox name="edids_raw_layout">
+              <QTextEdit name="edids_raw_box" readonly="true" placeholder="Raw bytes of the highlighted file." />
+            </vbox>
+          </tab>
+        </tabs>
+      </vbox>
+    </QGroupBox>
+  </splitter>
+</vbox>

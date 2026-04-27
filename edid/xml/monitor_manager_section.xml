@@ -1,0 +1,63 @@
+<QGroupBox name="manager_group" title="Monitor list and EDID sections" stretch="2">
+  <vbox name="manager_layout">
+    <QLabel name="manager_intro" wordWrap="true" text="Monitor editor: this shows the selected monitor's EDID broken into sections. Changes here only update the working EDID until you install it as an override." />
+    <hbox name="manager_toolbar">
+      <QLabel text="Monitor:" />
+      <QComboBox name="manager_selected_combo" stretch="1" />
+      <QPushButton name="manager_edit_button" text="Edit..." icon="SP_FileDialogContentsView" tooltip="Open advanced editors for the selected monitor's working EDID." />
+      <QPushButton name="manager_copy_button" text="Copy" icon="SP_FileDialogDetailedView" tooltip="Copy the selected monitor's working EDID." />
+      <QPushButton name="manager_paste_button" text="Paste" icon="SP_DialogApplyButton" tooltip="Install the copied EDID as an override for the selected monitor." />
+      <QPushButton name="manager_delete_button" text="Delete override" icon="SP_TrashIcon" tooltip="Remove only the EDID override for the selected monitor." />
+      <QPushButton name="manager_delete_monitor_button" text="Clear override data" icon="SP_DialogResetButton" tooltip="Remove EDID_OVERRIDE and EDID_RECOVERY data only. Active EDID is preserved." />
+      <QPushButton name="manager_refresh_button" text="Refresh monitor list" icon="SP_BrowserReload" tooltip="Reload monitor entries and EDID data from Windows." />
+    </hbox>
+    <hbox name="manager_body" stretch="1">
+      <QGroupBox name="established_group" title="Established resolutions" tooltip="Old compatibility modes advertised by the monitor. Usually safe to leave alone.">
+        <vbox name="established_layout">
+          <QListWidget name="manager_established_list" tooltip="Old compatibility modes advertised by the monitor. Usually safe to leave alone." />
+        </vbox>
+      </QGroupBox>
+      <widget class="QWidget" name="manager_lists_panel" stretch="1">
+        <vbox name="manager_lists_layout">
+          <QLabel name="manager_summary_label" objectName="hintLabel" wordWrap="true" text="Select a monitor to see what its EDID advertises." />
+          <QGroupBox name="detailed_group" title="Detailed resolutions" tooltip="Exact video modes. The first one is usually the preferred/native mode.">
+            <vbox name="detailed_layout">
+              <QListWidget name="manager_detailed_list" tooltip="Exact video modes. The first one is usually the preferred/native mode." />
+              <hbox name="detailed_buttons">
+                <QPushButton name="manager_add_detailed_button" text="Add..." icon="SP_FileDialogNewFolder" tooltip="Add a detailed resolution." />
+                <QPushButton name="manager_edit_detailed_button" text="Edit..." icon="SP_FileDialogContentsView" tooltip="Edit the selected detailed resolution." />
+                <QPushButton name="manager_delete_detailed_button" text="Delete" icon="SP_TrashIcon" tooltip="Delete the selected detailed resolution." />
+                <QPushButton name="manager_delete_all_detailed_button" text="Delete all" icon="SP_DialogResetButton" tooltip="Delete all detailed resolutions." />
+                <stretch />
+              </hbox>
+            </vbox>
+          </QGroupBox>
+          <QGroupBox name="standard_group" title="Standard resolutions" tooltip="Older compact resolution entries. Modern displays often have none.">
+            <vbox name="standard_layout">
+              <QListWidget name="manager_standard_list" tooltip="Older compact resolution entries. Modern displays often have none." />
+              <hbox name="standard_buttons">
+                <QPushButton name="manager_add_standard_button" text="Add..." icon="SP_FileDialogNewFolder" tooltip="Add a standard resolution." />
+                <QPushButton name="manager_edit_standard_button" text="Edit..." icon="SP_FileDialogContentsView" tooltip="Edit the selected standard resolution." />
+                <QPushButton name="manager_delete_standard_button" text="Delete" icon="SP_TrashIcon" tooltip="Delete the selected standard resolution." />
+                <QPushButton name="manager_delete_all_standard_button" text="Delete all" icon="SP_DialogResetButton" tooltip="Delete all standard resolutions." />
+                <stretch />
+              </hbox>
+            </vbox>
+          </QGroupBox>
+          <QGroupBox name="extension_group" title="Extension blocks" tooltip="Extra EDID blocks for HDMI/DisplayID/HDR/audio/VRR and other capabilities.">
+            <vbox name="extension_layout">
+              <QListWidget name="manager_extension_list" tooltip="Extra EDID blocks for HDMI/DisplayID/HDR/audio/VRR and other capabilities." />
+              <hbox name="extension_buttons">
+                <QPushButton name="manager_add_extension_button" text="Add..." icon="SP_FileDialogNewFolder" tooltip="Add an extension block." />
+                <QPushButton name="manager_edit_extension_button" text="Edit..." icon="SP_FileDialogContentsView" tooltip="Edit the selected extension block." />
+                <QPushButton name="manager_delete_extension_button" text="Delete" icon="SP_TrashIcon" tooltip="Delete the selected extension block." />
+                <QPushButton name="manager_delete_all_extension_button" text="Delete all" icon="SP_DialogResetButton" tooltip="Delete all extension blocks." />
+                <stretch />
+              </hbox>
+            </vbox>
+          </QGroupBox>
+        </vbox>
+      </widget>
+    </hbox>
+  </vbox>
+</QGroupBox>

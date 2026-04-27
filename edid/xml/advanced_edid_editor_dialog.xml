@@ -1,0 +1,135 @@
+<widget class="QDialog" name="advanced_edid_editor_dialog" title="Advanced EDID Editor">
+  <vbox name="advanced_layout">
+    <QLabel name="mode_help_label" text="Professional EDID workflow: edit identity, inputs, timing descriptors, range limits, and extension blocks; switch modes to expose raw payload controls." wordWrap="true" />
+    <tabs name="advanced_tabs" stretch="1">
+      <tab name="properties_tab" title="Identity">
+        <form name="properties_form">
+          <row label="Monitor Name"><QLineEdit name="prop_name" placeholder="13 character EDID display product name" tooltip="Written to the EDID 0xFC Monitor Name descriptor and used for library naming." /></row>
+          <row label="Manufacturer ID"><QLineEdit name="prop_manufacturer" placeholder="CLT" tooltip="Three-letter EISA manufacturer code." /></row>
+          <row label="Product Code"><QSpinBox name="prop_product" min="0" max="65535" tooltip="16-bit model/product code stored little-endian in the base EDID." /></row>
+          <row label="Serial Number"><QLineEdit name="prop_serial_number" placeholder="Numeric serial" tooltip="32-bit numeric serial in the base EDID header." /></row>
+          <row label="Serial Text"><QLineEdit name="prop_serial_text" placeholder="Optional serial descriptor" tooltip="Optional 0xFF display serial text descriptor." /></row>
+          <row label="ASCII Text"><QLineEdit name="prop_text" placeholder="Optional label or note" tooltip="Optional 0xFE ASCII text descriptor." /></row>
+          <row label="Manufacture Week"><QSpinBox name="prop_week" min="0" max="255" /></row>
+          <row label="Manufacture Year"><QSpinBox name="prop_year" min="1990" max="2245" /></row>
+          <row label="EDID Version"><QSpinBox name="prop_version" min="1" max="2" /></row>
+          <row label="EDID Revision"><QSpinBox name="prop_revision" min="0" max="4" /></row>
+          <row label="Input Type"><QCheckBox name="prop_digital" text="Digital input" tooltip="When cleared, analog sync controls are written instead of digital bit-depth/interface bits." /></row>
+          <row label="Digital Bit Depth"><QComboBox name="prop_bit_depth" tooltip="Digital input color depth code." /></row>
+          <row label="Digital Interface"><QComboBox name="prop_interface" tooltip="Digital interface code such as HDMI or DisplayPort." /></row>
+          <row label="Analog Signal Level"><QComboBox name="prop_analog_level" tooltip="Analog video signal level code." /></row>
+          <row label=""><QCheckBox name="prop_separate_sync" text="Separate sync" /></row>
+          <row label=""><QCheckBox name="prop_composite_sync" text="Composite sync" /></row>
+          <row label=""><QCheckBox name="prop_sync_on_green" text="Sync on green" /></row>
+          <row label="Width (cm)"><QSpinBox name="prop_width" min="0" max="255" /></row>
+          <row label="Height (cm)"><QSpinBox name="prop_height" min="0" max="255" /></row>
+          <row label="Gamma byte"><QSpinBox name="prop_gamma" min="0" max="255" tooltip="0 means undefined; otherwise EDID gamma byte." /></row>
+          <row label=""><QCheckBox name="prop_srgb" text="sRGB default color space" /></row>
+          <row label=""><QCheckBox name="prop_preferred" text="First detailed timing is preferred" /></row>
+          <row label=""><QCheckBox name="prop_continuous" text="Continuous frequency display" /></row>
+        </form>
+      </tab>
+      <tab name="limits_tab" title="Range Limits" tooltip="Write or remove the 0xFD display range limits descriptor.">
+        <form name="limits_form">
+          <row label="Min vertical (Hz)"><QSpinBox name="range_min_v" min="0" max="255" tooltip="Set all range fields to 0 to remove the range-limits descriptor." /></row>
+          <row label="Max vertical (Hz)"><QSpinBox name="range_max_v" min="0" max="255" /></row>
+          <row label="Min horizontal (kHz)"><QSpinBox name="range_min_h" min="0" max="255" /></row>
+          <row label="Max horizontal (kHz)"><QSpinBox name="range_max_h" min="0" max="255" /></row>
+          <row label="Max pixel clock (MHz)"><QSpinBox name="range_max_clock" min="0" max="2550" tooltip="Encoded in 10 MHz units." /></row>
+        </form>
+      </tab>
+      <tab name="established_tab" title="Established">
+        <vbox name="established_layout">
+          <QListWidget name="established_list" />
+        </vbox>
+      </tab>
+      <tab name="standard_tab" title="Standard Modes" tooltip="Edit the eight EDID standard timing slots.">
+        <vbox name="standard_layout">
+          <QListWidget name="standard_list" stretch="1" />
+          <form name="standard_form">
+            <row label="Width"><QSpinBox name="standard_width" min="256" max="2288" value="1920" tooltip="Standard timings encode width in 8-pixel steps." /></row>
+            <row label="Aspect"><QComboBox name="standard_aspect" tooltip="EDID standard timing aspect ratio." /></row>
+            <row label="Derived Height"><QSpinBox name="standard_height" min="1" max="8192" value="1080" tooltip="Derived from width and aspect ratio for EDID standard timings." /></row>
+            <row label="Refresh"><QSpinBox name="standard_refresh" min="60" max="123" value="60" tooltip="Standard timing refresh code supports 60-123 Hz." /></row>
+          </form>
+          <hbox name="standard_buttons">
+            <QPushButton name="standard_apply_button" text="Add / Replace Slot" icon="SP_DialogApplyButton" on_clicked="_replace_standard_timing" />
+            <QPushButton name="standard_clear_button" text="Clear Slot" icon="SP_TrashIcon" on_clicked="_clear_standard_timing" />
+            <QPushButton name="standard_defaults_button" text="PC Defaults" icon="SP_FileDialogDetailedView" on_clicked="_apply_standard_defaults" />
+            <stretch />
+          </hbox>
+        </vbox>
+      </tab>
+      <tab name="detailed_tab" title="Detailed Timings">
+        <vbox name="detailed_layout">
+          <QListWidget name="detailed_list" stretch="1" />
+          <form name="detailed_form">
+            <row label="Width"><QSpinBox name="timing_width" min="1" max="8192" value="1920" /></row>
+            <row label="Height"><QSpinBox name="timing_height" min="1" max="8192" value="1080" /></row>
+            <row label="Refresh"><QSpinBox name="timing_refresh" min="1" max="1000" value="60" /></row>
+            <row label="Formula"><QComboBox name="timing_mode" /></row>
+          </form>
+          <hbox name="detailed_buttons">
+            <QPushButton name="add_timing_button" text="Add Timing" icon="SP_FileDialogNewFolder" on_clicked="_add_generated_timing" />
+            <QPushButton name="replace_timing_button" text="Replace Selected" icon="SP_DialogApplyButton" on_clicked="_replace_generated_timing" />
+            <QPushButton name="preferred_timing_button" text="Set Preferred" icon="SP_DialogApplyButton" on_clicked="_set_preferred_timing" />
+            <QPushButton name="delete_timing_button" text="Delete" icon="SP_TrashIcon" on_clicked="_delete_detailed_timing" />
+            <stretch />
+          </hbox>
+        </vbox>
+      </tab>
+      <tab name="cea_tab" title="CTA / HDMI">
+        <vbox name="cea_layout">
+          <QComboBox name="extension_combo" />
+          <hbox name="extension_buttons">
+            <QPushButton name="add_cea_extension_button" text="Add CTA Extension" icon="SP_FileDialogNewFolder" on_clicked="_add_cea_extension" />
+            <QPushButton name="delete_cea_extension_button" text="Delete Extension" icon="SP_TrashIcon" on_clicked="_delete_cea_extension" />
+            <QPushButton name="extension_up_button" text="Extension Up" icon="SP_ArrowUp" on_clicked="_move_extension(-1)" />
+            <QPushButton name="extension_down_button" text="Extension Down" icon="SP_ArrowDown" on_clicked="_move_extension(1)" />
+            <stretch />
+          </hbox>
+          <QListWidget name="cea_list" stretch="1" />
+          <form name="cea_form">
+            <row label="Preset"><QComboBox name="cea_preset" tooltip="Common CTA-861 blocks for HDMI, HDR, audio, speaker, VRR, and 4:2:0 workflows." /></row>
+            <row label="Tag"><QSpinBox name="cea_tag" min="0" max="7" /></row>
+            <row label="Payload Hex"><QTextEdit name="cea_payload" placeholder="Raw CTA payload bytes, not including the block header." /></row>
+          </form>
+          <hbox name="cea_buttons">
+            <QPushButton name="load_cea_button" text="Load" icon="SP_DialogOpenButton" on_clicked="_load_cea_block" />
+            <QPushButton name="apply_cea_button" text="Apply" icon="SP_DialogApplyButton" on_clicked="_apply_cea_block" />
+            <QPushButton name="add_cea_button" text="Add" icon="SP_FileDialogNewFolder" on_clicked="_add_cea_block" />
+            <QPushButton name="delete_cea_button" text="Delete" icon="SP_TrashIcon" on_clicked="_delete_cea_block" />
+            <QPushButton name="up_cea_button" text="Up" icon="SP_ArrowUp" on_clicked="_move_cea(-1)" />
+            <QPushButton name="down_cea_button" text="Down" icon="SP_ArrowDown" on_clicked="_move_cea(1)" />
+            <stretch />
+          </hbox>
+        </vbox>
+      </tab>
+      <tab name="displayid_tab" title="DisplayID">
+        <vbox name="displayid_layout">
+          <QListWidget name="displayid_list" stretch="1" />
+          <form name="displayid_form">
+            <row label="Preset"><QComboBox name="did_preset" /></row>
+            <row label="Tag"><QSpinBox name="did_tag" min="0" max="255" /></row>
+            <row label="Revision"><QSpinBox name="did_revision" min="0" max="255" /></row>
+            <row label="Payload Hex"><QTextEdit name="did_payload" placeholder="Raw DisplayID block payload bytes." /></row>
+          </form>
+          <hbox name="displayid_buttons">
+            <QPushButton name="load_did_button" text="Load" icon="SP_DialogOpenButton" on_clicked="_load_displayid_block" />
+            <QPushButton name="apply_did_button" text="Apply" icon="SP_DialogApplyButton" on_clicked="_apply_displayid_block" />
+            <QPushButton name="add_did_button" text="Add" icon="SP_FileDialogNewFolder" on_clicked="_add_displayid_block" />
+            <QPushButton name="delete_did_button" text="Delete" icon="SP_TrashIcon" on_clicked="_delete_displayid_block" />
+            <QPushButton name="up_did_button" text="Up" icon="SP_ArrowUp" on_clicked="_move_displayid(-1)" />
+            <QPushButton name="down_did_button" text="Down" icon="SP_ArrowDown" on_clicked="_move_displayid(1)" />
+            <stretch />
+          </hbox>
+        </vbox>
+      </tab>
+    </tabs>
+    <hbox name="mode_controls">
+      <QPushButton name="mode_toggle_button" text="Switch to Expert" />
+      <stretch />
+    </hbox>
+    <QDialogButtonBox name="buttons" buttons="Ok|Cancel" />
+  </vbox>
+</widget>

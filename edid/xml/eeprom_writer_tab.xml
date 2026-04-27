@@ -1,0 +1,53 @@
+<vbox name="eeprom_layout">
+  <QLabel name="eeprom_warning" wordWrap="true" text="Advanced only: this flashes the physical monitor memory—permanent until written again. Unlike the Windows Override tab (reversible registry patch only), EEPROM cannot be undone by deleting registry keys. Hardware access depends on OS and GPU/backend (Windows: AMD ADL / NVIDIA NVAPI; Linux may use ddcutil for reads)." />
+  <stack name="eeprom_stack" stretch="1">
+    <widget class="QWidget" name="eeprom_login_page">
+      <vbox name="eeprom_login_layout">
+        <QLabel name="login_text" wordWrap="true" text="Sign in with an approved project-tracker account to unlock permanent EEPROM read/write operations." />
+        <QLabel name="tracker_link" text="&lt;a href=&quot;https://tracker.colorlightcloud.com&quot;&gt;Open project tracker&lt;/a&gt;" openExternalLinks="true" />
+        <form name="eeprom_login_form">
+          <row label="Email"><QLineEdit name="eeprom_email_edit" placeholder="email@example.com" /></row>
+          <row label="Password"><QLineEdit name="eeprom_password_edit" echoMode="password" /></row>
+        </form>
+        <QPushButton name="eeprom_login_button" text="Sign In" icon="SP_DialogApplyButton" tooltip="Authenticate with project-tracker to unlock EEPROM operations." />
+        <QLabel name="eeprom_login_status" text="" />
+        <stretch />
+      </vbox>
+    </widget>
+    <widget class="QWidget" name="eeprom_controls_page">
+      <vbox name="eeprom_controls_layout">
+        <hbox name="hardware_bar">
+          <QLabel text="Step 1 - Choose hardware output:" />
+          <QComboBox name="hardware_combo" stretch="1" />
+          <QPushButton name="refresh_hardware_button" text="Refresh hardware outputs" icon="SP_BrowserReload" tooltip="Rescan GPU/DDC hardware outputs." />
+        </hbox>
+        <QGroupBox name="hardware_group" title="Step 2 - Read or write monitor EEPROM">
+          <grid name="hardware_grid">
+            <QLabel name="eeprom_auth_label" text="Unlocked." row="0" column="0" colspan="2" />
+            <QPushButton name="logout_eeprom_button" text="Sign Out" icon="SP_DialogCloseButton" tooltip="Clear cached project-tracker login and lock EEPROM operations." row="1" column="0" colspan="2" />
+            <widget class="QWidget" name="eeprom_payload_widget" row="2" column="0" colspan="2">
+              <hbox name="eeprom_payload_row">
+                <QPushButton name="eeprom_load_payload_button" text="Load from file..." icon="SP_DialogOpenButton" tooltip="Load EDID or DisplayID from disk (same as File → Load). All tabs share one working copy." />
+                <QLabel name="eeprom_payload_label" stretch="1" wordWrap="true" text="No payload loaded yet." />
+              </hbox>
+            </widget>
+            <widget class="QWidget" name="eeprom_library_widget" row="3" column="0" colspan="2">
+              <hbox name="eeprom_library_row" spacing="8">
+                <QLabel text="Library profile:" />
+                <QComboBox name="eeprom_library_combo" stretch="1" />
+                <QPushButton name="eeprom_load_library_entry_button" text="Load" icon="SP_DialogApplyButton" tooltip="Load the selected library profile into the shared working payload." />
+              </hbox>
+            </widget>
+            <QLabel name="hardware_tip" wordWrap="true" text="Tip: read from hardware first to keep a backup. Writes use the payload above — load a file or read from hardware." row="4" column="0" colspan="2" />
+            <QPushButton name="read_hardware_edid_button" text="Backup: read EDID from EEPROM" icon="SP_DialogSaveButton" tooltip="Read EDID bytes from the selected hardware output." row="5" column="0" />
+            <QPushButton name="read_hardware_displayid_button" text="Backup: read DisplayID from EEPROM" icon="SP_DialogSaveButton" tooltip="Read DisplayID bytes from the selected hardware output." row="5" column="1" />
+            <QPushButton name="write_hardware_edid_button" text="Permanent write: EDID to EEPROM" icon="SP_MessageBoxWarning" tooltip="Permanently write the EDID payload shown above to the selected display EEPROM." row="6" column="0" />
+            <QPushButton name="write_hardware_displayid_button" text="Permanent write: DisplayID to EEPROM" icon="SP_MessageBoxWarning" tooltip="Permanently write the DisplayID payload shown above to the selected display EEPROM." row="6" column="1" />
+            <QLabel name="hardware_backend_label" wordWrap="true" row="7" column="0" colspan="2" />
+          </grid>
+        </QGroupBox>
+        <stretch />
+      </vbox>
+    </widget>
+  </stack>
+</vbox>

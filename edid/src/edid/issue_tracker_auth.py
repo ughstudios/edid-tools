@@ -7,9 +7,15 @@ from datetime import datetime, timedelta, timezone
 import json
 import os
 from pathlib import Path
-import subprocess
 from ctypes import wintypes
-from .logging_utils import log_exception, log_notice
+from http.cookiejar import CookieJar
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode
+from urllib.request import HTTPCookieProcessor, Request, build_opener
+from edid.logging_utils import log_exception, log_notice
+
+
+PROJECT_TRACKER_URL = "https://tracker.colorlightcloud.com"
 
 
 class IssueTrackerAuthError(RuntimeError):
@@ -30,81 +36,82 @@ class DATA_BLOB(ctypes.Structure):
 
 
 def authenticate_issue_tracker_user(email: str, password: str) -> IssueTrackerAuthResult:
-    issue_tracker_dir = _find_issue_tracker_dir()
-    if not issue_tracker_dir:
-        raise IssueTrackerAuthError("Could not find the project-tracker app folder.")
-
-    script = r"""
-const fs = require("fs");
-const path = require("path");
-const dotenv = require("dotenv");
-
-for (const name of [".env.local", ".env"]) {
-  const file = path.join(process.cwd(), name);
-  if (fs.existsSync(file)) dotenv.config({ path: file });
-}
-
-const bcrypt = require("bcryptjs");
-const { PrismaClient } = require("./src/generated/prisma");
-
-let input = "";
-process.stdin.setEncoding("utf8");
-process.stdin.on("data", chunk => input += chunk);
-process.stdin.on("end", async () => {
-  const prisma = new PrismaClient();
-  try {
-    const { email, password } = JSON.parse(input || "{}");
-    const normalizedEmail = String(email || "").trim().toLowerCase();
-    const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
-    if (!user || user.approvalStatus !== "APPROVED") {
-      console.log(JSON.stringify({ ok: false, error: "Invalid credentials or account is not approved." }));
-      return;
-    }
-    const valid = await bcrypt.compare(String(password || ""), user.passwordHash);
-    if (!valid) {
-      console.log(JSON.stringify({ ok: false, error: "Invalid credentials or account is not approved." }));
-      return;
-    }
-    console.log(JSON.stringify({ ok: true, name: user.name, email: user.email, role: user.role }));
-  } catch (error) {
-    console.log(JSON.stringify({ ok: false, error: error instanceof Error ? error.message : String(error) }));
-  } finally {
-    await prisma.$disconnect();
-  }
-});
-"""
+    normalized_email = email.strip().lower()
+    cookie_jar = CookieJar()
+    opener = build_opener(HTTPCookieProcessor(cookie_jar))
     try:
-        completed = subprocess.run(
-            ["node", "-e", script],
-            input=json.dumps({"email": email, "password": password}),
-            cwd=str(issue_tracker_dir),
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            capture_output=True,
-            timeout=30,
-            check=False,
-        )
-    except FileNotFoundError as exc:
-        raise IssueTrackerAuthError("Node.js is required to authenticate against project-tracker login.") from exc
-    except subprocess.TimeoutExpired as exc:
+        csrf = _fetch_csrf(opener)
+        _post_credentials(opener, normalized_email, password, csrf)
+        user = _fetch_current_user(opener)
+    except HTTPError as exc:
+        message = exc.read().decode("utf-8", errors="replace") if exc.fp else str(exc)
+        raise IssueTrackerAuthError(f"Project-tracker login failed: HTTP {exc.code}: {message}") from exc
+    except URLError as exc:
+        raise IssueTrackerAuthError(f"Could not reach project-tracker: {exc}") from exc
+    except TimeoutError as exc:
         raise IssueTrackerAuthError("Project-tracker authentication timed out.") from exc
 
-    output = completed.stdout.strip().splitlines()[-1] if completed.stdout.strip() else ""
-    if not output:
-        message = completed.stderr.strip() or "Project-tracker authentication returned no result."
-        raise IssueTrackerAuthError(message)
-    try:
-        payload = json.loads(output)
-    except json.JSONDecodeError as exc:
-        raise IssueTrackerAuthError(output) from exc
+    if not user:
+        return IssueTrackerAuthResult(ok=False, error="Invalid credentials or account is not approved.")
     return IssueTrackerAuthResult(
-        ok=bool(payload.get("ok")),
-        name=payload.get("name"),
-        email=payload.get("email"),
-        role=payload.get("role"),
-        error=payload.get("error"),
+        ok=True,
+        name=user.get("name"),
+        email=user.get("email") or normalized_email,
+        role=user.get("role"),
     )
+
+
+def _fetch_csrf(opener: object) -> str:
+    request = Request(f"{PROJECT_TRACKER_URL}/api/auth/csrf", headers={"Accept": "application/json"})
+    with opener.open(request, timeout=20) as response:
+        payload = json.loads(response.read().decode("utf-8"))
+    token = payload.get("csrfToken")
+    if not token:
+        raise IssueTrackerAuthError("Project-tracker did not return a CSRF token.")
+    return str(token)
+
+
+def _post_credentials(opener: object, email: str, password: str, csrf: str) -> None:
+    body = urlencode(
+        {
+            "csrfToken": csrf,
+            "email": email,
+            "password": password,
+            "redirect": "false",
+            "callbackUrl": f"{PROJECT_TRACKER_URL}/",
+            "json": "true",
+        }
+    ).encode("utf-8")
+    request = Request(
+        f"{PROJECT_TRACKER_URL}/api/auth/callback/credentials",
+        data=body,
+        headers={
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json",
+            "User-Agent": "Colorlight EDID Tools",
+        },
+        method="POST",
+    )
+    with opener.open(request, timeout=20) as response:
+        payload_text = response.read().decode("utf-8", errors="replace")
+    try:
+        payload = json.loads(payload_text) if payload_text else {}
+    except json.JSONDecodeError:
+        payload = {}
+    if payload.get("error"):
+        raise IssueTrackerAuthError("Invalid credentials or account is not approved.")
+
+
+def _fetch_current_user(opener: object) -> dict[str, str] | None:
+    request = Request(f"{PROJECT_TRACKER_URL}/api/me", headers={"Accept": "application/json"})
+    with opener.open(request, timeout=20) as response:
+        payload = json.loads(response.read().decode("utf-8"))
+    user = payload.get("user") if isinstance(payload, dict) else None
+    if isinstance(user, dict) and user.get("email"):
+        return {key: str(value) for key, value in user.items() if value is not None}
+    if isinstance(payload, dict) and payload.get("email"):
+        return {key: str(value) for key, value in payload.items() if value is not None}
+    return None
 
 
 def save_cached_auth(result: IssueTrackerAuthResult) -> None:
@@ -190,14 +197,3 @@ def _unprotect_bytes(data: bytes) -> bytes:
     finally:
         kernel32.LocalFree(output_blob.pbData)
 
-
-def _find_issue_tracker_dir() -> Path | None:
-    current = Path(__file__).resolve()
-    for parent in current.parents:
-        candidate = parent / "issue-tracker"
-        if (candidate / "package.json").exists() and (candidate / "src/generated/prisma").exists():
-            return candidate
-        sibling = parent.parent / "issue-tracker"
-        if (sibling / "package.json").exists() and (sibling / "src/generated/prisma").exists():
-            return sibling
-    return None

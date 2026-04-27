@@ -5,7 +5,7 @@ import ctypes
 import os
 import subprocess
 import sys
-from .logging_utils import log_exception
+from edid.logging_utils import log_exception
 
 
 class ElevationError(RuntimeError):
@@ -35,10 +35,15 @@ def request_elevation_gui() -> None:
     if os.name != "nt":
         raise ElevationError("Elevation requests are only available on Windows.")
 
-    script = Path(__file__).resolve().parents[1] / "edid_tools.py"
     executable = _python_executable()
-    parameters = f'"{script}" gui'
-    result = ctypes.windll.shell32.ShellExecuteW(None, "runas", executable, parameters, str(script.parent), 1)
+    if getattr(sys, "frozen", False):
+        parameters = "gui"
+        working_directory = str(Path(sys.executable).resolve().parent)
+    else:
+        script = Path(__file__).resolve().parents[1] / "edid_tools.py"
+        parameters = f'"{script}" gui'
+        working_directory = str(script.parent)
+    result = ctypes.windll.shell32.ShellExecuteW(None, "runas", executable, parameters, working_directory, 1)
     if result <= 32:
         raise ElevationError(f"ShellExecuteW elevation request failed with code {result}.")
 

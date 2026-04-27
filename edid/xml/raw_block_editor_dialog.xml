@@ -1,0 +1,12 @@
+<widget class="QDialog" name="raw_block_editor_dialog" title="Raw EDID Block Editor">
+  <vbox name="raw_block_editor_layout">
+    <hbox name="raw_block_top">
+      <QLabel text="Block:" />
+      <QComboBox name="block_combo" stretch="1" />
+      <QPushButton name="add_button" text="Add Extension" icon="SP_FileDialogNewFolder" tooltip="Append a new blank 128-byte EDID extension block." />
+      <QPushButton name="delete_button" text="Delete Extension" icon="SP_TrashIcon" tooltip="Delete the selected EDID extension block." />
+    </hbox>
+    <QTextEdit name="hex_editor" stretch="1" />
+    <QDialogButtonBox name="buttons" buttons="Ok|Cancel" />
+  </vbox>
+</widget>

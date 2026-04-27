@@ -1,0 +1,65 @@
+<widget class="QDialog" name="decoded_edid_dialog" title="Decoded EDID">
+  <vbox name="decoded_layout">
+    <QPlainTextEdit name="decoded_text" readonly="true" stretch="1" />
+    <tabs name="edit_tabs">
+      <tab name="identity_tab" title="Identity">
+        <form name="identity_form">
+          <row label="Manufacturer ID"><QLineEdit name="manufacturer_edit" /></row>
+          <row label="Product code"><QSpinBox name="product_spin" min="0" max="65535" /></row>
+          <row label="Serial number"><QLineEdit name="serial_number_edit" /></row>
+          <row label="Manufacture week"><QSpinBox name="week_spin" min="0" max="255" /></row>
+          <row label="Manufacture year"><QSpinBox name="year_spin" min="1990" max="2245" /></row>
+          <row label="EDID version"><QSpinBox name="version_spin" min="1" max="2" /></row>
+          <row label="EDID revision"><QSpinBox name="revision_spin" min="0" max="4" /></row>
+        </form>
+      </tab>
+      <tab name="display_tab" title="Display">
+        <form name="display_form">
+          <row label=""><QCheckBox name="digital_check" text="Digital input" /></row>
+          <row label="Digital bit depth"><QComboBox name="bit_depth_combo" /></row>
+          <row label="Digital interface"><QComboBox name="interface_combo" /></row>
+          <row label="Analog signal level"><QComboBox name="analog_level_combo" /></row>
+          <row label=""><QCheckBox name="separate_sync_check" text="Separate sync" /></row>
+          <row label=""><QCheckBox name="composite_sync_check" text="Composite sync" /></row>
+          <row label=""><QCheckBox name="sync_on_green_check" text="Sync on green" /></row>
+          <row label="Width (cm)"><QSpinBox name="width_spin" min="0" max="255" /></row>
+          <row label="Height (cm)"><QSpinBox name="height_spin" min="0" max="255" /></row>
+          <row label="Gamma byte"><QSpinBox name="gamma_spin" min="0" max="255" /></row>
+          <row label=""><QCheckBox name="standby_check" text="DPMS standby" /></row>
+          <row label=""><QCheckBox name="suspend_check" text="DPMS suspend" /></row>
+          <row label=""><QCheckBox name="active_off_check" text="DPMS active off" /></row>
+          <row label=""><QCheckBox name="srgb_check" text="sRGB" /></row>
+          <row label=""><QCheckBox name="preferred_check" text="Preferred timing flag" /></row>
+          <row label=""><QCheckBox name="continuous_check" text="Continuous frequency" /></row>
+        </form>
+      </tab>
+      <tab name="color_tab" title="Color">
+        <form name="color_form">
+          <row label="Chromaticity byte 25"><QSpinBox name="color_25" min="0" max="255" /></row>
+          <row label="Chromaticity byte 26"><QSpinBox name="color_26" min="0" max="255" /></row>
+          <row label="Chromaticity byte 27"><QSpinBox name="color_27" min="0" max="255" /></row>
+          <row label="Chromaticity byte 28"><QSpinBox name="color_28" min="0" max="255" /></row>
+          <row label="Chromaticity byte 29"><QSpinBox name="color_29" min="0" max="255" /></row>
+          <row label="Chromaticity byte 30"><QSpinBox name="color_30" min="0" max="255" /></row>
+          <row label="Chromaticity byte 31"><QSpinBox name="color_31" min="0" max="255" /></row>
+          <row label="Chromaticity byte 32"><QSpinBox name="color_32" min="0" max="255" /></row>
+          <row label="Chromaticity byte 33"><QSpinBox name="color_33" min="0" max="255" /></row>
+          <row label="Chromaticity byte 34"><QSpinBox name="color_34" min="0" max="255" /></row>
+        </form>
+      </tab>
+      <tab name="descriptor_tab" title="Descriptors">
+        <form name="descriptor_form">
+          <row label="Monitor name"><QLineEdit name="name_edit" /></row>
+          <row label="Serial text"><QLineEdit name="serial_edit" /></row>
+          <row label="ASCII text"><QLineEdit name="text_edit" /></row>
+          <row label="Min vertical Hz"><QSpinBox name="range_min_v" min="0" max="255" /></row>
+          <row label="Max vertical Hz"><QSpinBox name="range_max_v" min="0" max="255" /></row>
+          <row label="Min horizontal kHz"><QSpinBox name="range_min_h" min="0" max="255" /></row>
+          <row label="Max horizontal kHz"><QSpinBox name="range_max_h" min="0" max="255" /></row>
+          <row label="Max pixel clock MHz"><QSpinBox name="range_max_clock" min="0" max="2550" /></row>
+        </form>
+      </tab>
+    </tabs>
+    <QDialogButtonBox name="buttons" buttons="Ok|Cancel" />
+  </vbox>
+</widget>

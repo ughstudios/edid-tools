@@ -1,0 +1,51 @@
+<widget class="QWidget" name="root">
+
+  <menu_bar name="main_menu_bar">
+    <menu name="file_menu" title="File">
+      <action name="load_action" text="Load..." on_triggered="_load_file" />
+      <action name="save_action" text="Save..." on_triggered="_save_file" />
+      <separator />
+      <action name="exit_action" text="Exit" on_triggered="close" />
+    </menu>
+    <menu name="edit_menu" title="Edit">
+      <action name="preferences_action" text="Preferences..." on_triggered="_show_preferences" />
+    </menu>
+    <menu name="help_menu" title="Help">
+      <action name="about_action" text="About" on_triggered="_show_about" />
+    </menu>
+  </menu_bar>
+
+  <vbox name="root_layout">
+
+    <tabs name="main_tabs">
+
+      <tab name="override_tab" title="Windows Override">
+
+        <include file="windows_override_tab.xml" />
+
+      </tab>
+
+      <tab name="edids_tab" title="Library and live editor">
+
+        <include file="edids_tab.xml" />
+
+      </tab>
+
+      <tab name="eeprom_tab" title="Permanent EEPROM Write">
+
+        <include file="eeprom_writer_tab.xml" />
+
+      </tab>
+
+      <tab name="maintenance_tab" title="Windows Driver Maintenance">
+
+        <include file="driver_maintenance_tab.xml" />
+
+      </tab>
+
+    </tabs>
+
+  </vbox>
+
+</widget>
+

@@ -10,8 +10,8 @@ import subprocess
 import time
 from typing import Callable
 
-from .edid_data import DisplayData
-from .logging_utils import log_event, log_exception, log_notice
+from edid.edid_data import DisplayData
+from edid.logging_utils import log_event, log_exception, log_notice
 
 
 EDID_I2C_ADDRESS = 0xA0

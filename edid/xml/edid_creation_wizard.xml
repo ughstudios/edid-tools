@@ -1,0 +1,46 @@
+<widget class="QWizard" name="edid_creation_wizard" title="Create EDID">
+  <wizard_page name="identity_page" title="Identity" subtitle="Display name, manufacturer ID, product identifiers, and physical size">
+    <vbox name="identity_outer" spacing="8">
+      <QLabel name="intro" wordWrap="true" text="Use Next and Back to move through the steps. The last step is a short reference; click Finish to generate the EDID and save it to the library." />
+      <grid name="identity_grid" spacing="8" columnstretch="0,1">
+        <QLabel text="Display name" row="0" column="0" />
+        <QLineEdit name="wizard_name" text="Custom Monitor" row="0" column="1" />
+        <QLabel text="Manufacturer ID (3 letters)" row="1" column="0" />
+        <QLineEdit name="wizard_manufacturer" text="CLT" row="1" column="1" />
+        <QLabel text="Product code" row="2" column="0" />
+        <QSpinBox name="wizard_product" min="0" max="65535" value="4660" row="2" column="1" />
+        <QLabel text="Serial number" row="3" column="0" />
+        <QSpinBox name="wizard_serial" min="0" max="999999999" value="1" row="3" column="1" />
+        <QLabel text="Physical width (cm)" row="4" column="0" />
+        <QSpinBox name="wizard_width_cm" min="1" max="255" value="60" row="4" column="1" />
+        <QLabel text="Physical height (cm)" row="5" column="0" />
+        <QSpinBox name="wizard_height_cm" min="1" max="255" value="34" row="5" column="1" />
+      </grid>
+      <stretch value="1" />
+    </vbox>
+  </wizard_page>
+  <wizard_page name="native_page" title="Native mode" subtitle="Preferred resolution, refresh rate, and timing formula">
+    <grid name="native_grid" spacing="8" columnstretch="0,1">
+      <QLabel text="Native width" row="0" column="0" />
+      <QSpinBox name="wizard_h_active" min="320" max="8192" value="1920" row="0" column="1" />
+      <QLabel text="Native height" row="1" column="0" />
+      <QSpinBox name="wizard_v_active" min="200" max="8192" value="1080" row="1" column="1" />
+      <QLabel text="Refresh rate" row="2" column="0" />
+      <QSpinBox name="wizard_refresh" min="24" max="240" value="60" row="2" column="1" />
+      <QLabel text="Timing formula" row="3" column="0" />
+      <QComboBox name="wizard_timing_mode" row="3" column="1" />
+    </grid>
+  </wizard_page>
+  <wizard_page name="advanced_page" title="Advanced" subtitle="Optional: open the block editor after creation">
+    <vbox name="advanced_layout" spacing="8">
+      <QCheckBox name="wizard_open_advanced" text="Open advanced editor after this wizard (recommended for HDMI/HDR/audio)" checked="true" />
+      <QLabel name="advanced_hint" objectName="hintLabel" wordWrap="true" text="The advanced editor is where most professional work happens: CEA extension blocks (HDMI VSDB, HDR metadata, audio descriptors), extension ordering, and optional raw block editing." />
+      <stretch value="1" />
+    </vbox>
+  </wizard_page>
+  <wizard_page name="help_page" title="Field reference" subtitle="What each setting means">
+    <vbox name="help_layout">
+      <QTextEdit name="wizard_help" readonly="true" text="What the fields mean:&#10;&#10;- Manufacturer ID: three letters used in the EDID product ID.&#10;- Product code and serial: identify the display to Windows.&#10;- Physical size: used for DPI and display information.&#10;- Native mode: the preferred resolution and refresh rate.&#10;- Timing formula: reduced blanking is a safe default for modern flat panels.&#10;&#10;After you finish, the EDID is saved to the on-disk library (Library and live editor tab). You can export a file immediately, or install a reversible Windows override from the Windows Override tab or that library view." />
+    </vbox>
+  </wizard_page>
+</widget>

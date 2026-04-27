@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import IntEnum
 
-from .edid_data import DisplayDataError
-from .structured_edid import CEADataBlock, CEADataBlockTag
+from edid.edid_data import DisplayDataError
+from edid.structured_edid import CEADataBlock, CEADataBlockTag
 
 
 HDMI_OUI = 0x000C03

@@ -1,0 +1,32 @@
+<vbox name="override_layout">
+  <QLabel name="override_intro" wordWrap="true" text="Short path on Windows: load the small binary capability blob the GPU reads from the monitor (or a file), optionally tweak it, then install a reversible registry override. This does not flash the monitor's hardware EEPROM—that is only on the EEPROM tab." />
+  <hbox name="display_toolbar">
+    <QLabel text="Step 1 - Choose display:" />
+    <QComboBox name="display_combo" stretch="1" />
+    <QPushButton name="refresh_button" text="Refresh displays" icon="SP_BrowserReload" tooltip="Reload the monitor list from Windows." />
+  </hbox>
+  <QGroupBox name="data_group" title="Step 2 - Load, decode, or edit EDID data" stretch="1">
+    <grid name="data_grid">
+      <QLabel name="source_label" objectName="hintLabel" text="Choose a source" row="0" column="0" colspan="3" />
+      <QPushButton name="read_active_button" text="Read from monitor (effective / active)" icon="SP_ComputerIcon" tooltip="Load what Windows is using now from the display chain—the effective capability blob (not only the optional registry override layer)." row="1" column="0" />
+      <QPushButton name="read_override_button" text="Read installed registry override" icon="SP_DriveHDIcon" tooltip="If a Windows EDID override is installed for this monitor, load that registry layer (may be empty)." row="1" column="1" />
+      <QPushButton name="save_button" text="Save EDID to file..." icon="SP_DialogSaveButton" tooltip="Save the current working EDID/DisplayID to a file." row="1" column="2" />
+      <widget class="QWidget" name="preview_panel" row="2" column="0" colspan="3">
+        <hbox name="preview_layout">
+          <QTextEdit name="text_box" readonly="true" placeholder="Raw EDID hex will appear here." stretch="1" />
+          <QPlainTextEdit name="decoded_preview_box" readonly="true" placeholder="Decoded EDID details will appear here." stretch="1" />
+        </hbox>
+      </widget>
+      <QLabel name="current_data_label" wordWrap="true" text="Nothing loaded yet. Read from the selected monitor or load a file." row="3" column="0" colspan="3" />
+      <QLabel name="edit_label" objectName="hintLabel" text="Load or save" row="4" column="0" colspan="3" />
+      <QPushButton name="load_button" text="Load EDID file..." icon="SP_DialogOpenButton" tooltip="Load EDID/DisplayID data from BIN, DAT, TXT, or INF." row="5" column="0" />
+    </grid>
+  </QGroupBox>
+  <QGroupBox name="apply_group" title="Step 3 - Apply safely">
+    <hbox name="apply_layout">
+      <QLabel name="apply_hint" wordWrap="true" text="Install or remove an optional Windows registry layer for the monitor in Step 1. The OS treats it like a patched capability file—reversible, no hardware flash. Restart the display driver (Driver Maintenance tab) or reboot if nothing changes immediately." stretch="1" />
+      <QPushButton name="install_button" text="Install Windows EDID override" icon="SP_DialogApplyButton" tooltip="Writes a Windows registry override. This is reversible and safer than EEPROM writing." />
+      <QPushButton name="override_remove_button" text="Remove installed override" icon="SP_DialogResetButton" tooltip="Removes the EDID override for the display selected in Step 1. Active EDID cache is preserved." />
+    </hbox>
+  </QGroupBox>
+</vbox>

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .edid_data import EDID_BLOCK_SIZE, EDID_HEADER, DisplayData
+from edid.edid_data import EDID_BLOCK_SIZE, EDID_HEADER, DisplayData
 
 
 EMBEDDED_EDID_MAGIC = bytes([0x71, 0x42, 0x12, 0x83, 0x54, 0x24, 0x95, 0x66])

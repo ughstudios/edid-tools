@@ -1,0 +1,18 @@
+<vbox name="maintenance_layout">
+  <QLabel name="maintenance_intro" wordWrap="true" text="These actions affect Windows display-driver state and cached display configuration. Use them after installing or removing overrides, or if Windows needs to redetect displays." />
+  <QGroupBox name="maintenance_group" title="Windows display-driver tools">
+    <vbox name="maintenance_group_layout">
+      <hbox name="maintenance_selector">
+        <QLabel text="Selected display:" />
+        <QComboBox name="maintenance_display_combo" stretch="1" />
+      </hbox>
+      <hbox name="maintenance_buttons">
+        <QPushButton name="reset_selected_button" text="Remove selected override" icon="SP_DialogResetButton" tooltip="Removes the EDID override for the selected display from Windows." />
+        <QPushButton name="reset_all_button" text="Reset all overrides" icon="SP_TrashIcon" tooltip="Clears all display overrides and display-driver cache entries. Active EDID is preserved." />
+        <QPushButton name="restart_button" text="Restart display driver" icon="SP_BrowserReload" tooltip="Disables and re-enables display adapters so Windows redetects displays." />
+        <QPushButton name="recovery_restart_button" text="Recovery restart" icon="SP_MessageBoxWarning" tooltip="Temporarily stages override recovery data, restarts the driver, then restores overrides." />
+      </hbox>
+    </vbox>
+  </QGroupBox>
+  <stretch />
+</vbox>

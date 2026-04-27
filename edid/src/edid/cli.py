@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import sys
 
-from .edid_data import DisplayData, DisplayDataError, load_display_data, save_display_data
+from edid.edid_data import DisplayData, DisplayDataError, load_display_data, save_display_data
 
 
 REVIEW_TEXT = """\
@@ -111,7 +111,7 @@ def build_parser() -> argparse.ArgumentParser:
     install.add_argument("--yes", action="store_true", help="confirm registry writes")
     install.set_defaults(func=cmd_install_override)
 
-    reset_display = subparsers.add_parser("reset-display", help="remove EDID data/overrides for a target display")
+    reset_display = subparsers.add_parser("reset-display", help="remove override/recovery data for a target display")
     reset_display.add_argument("--target", default="all", help="device id, product id, DEVICE\\INSTANCE, or all")
     reset_display.add_argument("--dry-run", action="store_true")
     reset_display.add_argument("--yes", action="store_true", help="confirm registry writes")
@@ -157,8 +157,8 @@ def cmd_info(args: argparse.Namespace) -> int:
 
 
 def cmd_structured_info(args: argparse.Namespace) -> int:
-    from .displayid import DisplayIDDocument
-    from .structured_edid import StructuredEDID
+    from edid.displayid import DisplayIDDocument
+    from edid.structured_edid import StructuredEDID
 
     display_data = load_display_data(args.input)
     if display_data.is_displayid:
@@ -178,7 +178,7 @@ def cmd_convert(args: argparse.Namespace) -> int:
 
 
 def cmd_extract_embedded(args: argparse.Namespace) -> int:
-    from .cru_import_export import extract_edids_from_binary
+    from edid.cru_import_export import extract_edids_from_binary
 
     raw = Path(args.input).read_bytes()
     matches = extract_edids_from_binary(raw)
@@ -204,7 +204,7 @@ def cmd_fix(args: argparse.Namespace) -> int:
 
 
 def cmd_list_displays(args: argparse.Namespace) -> int:
-    from . import windows_display
+    from edid import windows_display
 
     displays = windows_display.list_display_instances()
     if args.json:
@@ -219,7 +219,7 @@ def cmd_list_displays(args: argparse.Namespace) -> int:
 
 
 def cmd_export_display(args: argparse.Namespace) -> int:
-    from . import windows_display
+    from edid import windows_display
 
     display_data = windows_display.export_display_data(args.target, source=args.source)
     save_display_data(display_data, args.output, args.format)
@@ -228,7 +228,7 @@ def cmd_export_display(args: argparse.Namespace) -> int:
 
 
 def cmd_list_hardware(_args: argparse.Namespace) -> int:
-    from . import hardware_display
+    from edid import hardware_display
 
     if _args.status:
         for status in hardware_display.hardware_backend_status():
@@ -277,7 +277,7 @@ def cmd_write_hardware(args: argparse.Namespace) -> int:
 
 
 def cmd_install_override(args: argparse.Namespace) -> int:
-    from . import windows_display
+    from edid import windows_display
 
     display_data = load_display_data(args.input, trim=False)
     if args.fix:
@@ -300,10 +300,10 @@ def cmd_install_override(args: argparse.Namespace) -> int:
 
 
 def cmd_reset_display(args: argparse.Namespace) -> int:
-    from . import windows_display
+    from edid import windows_display
 
     if not args.dry_run:
-        _require_confirmation(args.yes, f"reset display registry data for {args.target}")
+        _require_confirmation(args.yes, f"remove display override/recovery data for {args.target}")
         _require_admin(windows_display)
     matches = windows_display.reset_display(args.target, dry_run=args.dry_run)
     action = "Would reset" if args.dry_run else "Reset"
@@ -315,7 +315,7 @@ def cmd_reset_display(args: argparse.Namespace) -> int:
 
 
 def cmd_reset_all(args: argparse.Namespace) -> int:
-    from . import windows_display
+    from edid import windows_display
 
     if not args.dry_run:
         _require_confirmation(args.yes, "reset all display overrides and graphics cache keys")
@@ -329,7 +329,7 @@ def cmd_reset_all(args: argparse.Namespace) -> int:
 
 
 def cmd_restart_driver(args: argparse.Namespace) -> int:
-    from . import windows_display
+    from edid import windows_display
 
     _require_confirmation(args.yes, "restart display adapters")
     _require_admin(windows_display)
@@ -347,11 +347,14 @@ def cmd_restart_driver(args: argparse.Namespace) -> int:
 
 
 def cmd_gui(_args: argparse.Namespace) -> int:
-    from .elevation import ensure_gui_elevated
-    from .gui import run_gui
+    from edid.elevation import ensure_gui_elevated
+    from edid.ui_loader import ensure_generated_ui_modules
 
     if not ensure_gui_elevated():
         return 0
+    ensure_generated_ui_modules()
+    from edid.gui import run_gui
+
     return run_gui()
 
 
@@ -372,7 +375,7 @@ def _display_to_json(display: object) -> dict[str, object]:
 
 
 def _find_hardware_display(target: str) -> object:
-    from . import hardware_display
+    from edid import hardware_display
 
     normalized = target.strip().upper()
     displays = hardware_display.list_hardware_displays()
