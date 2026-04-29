@@ -1,0 +1,135 @@
+{
+  "generated_at": "2026-04-28",
+  "source_folder": "C:\\Users\\pbssu\\OneDrive\\Desktop\\ColorlightDatasheets\\extracted_specsheets",
+  "selection_notes": "Condensed from extracted sender_processor markdown/spec indexes. LED capacities are model-level published loads where available; VX models use 650,000 pixels per 1G output port.",
+  "processors": [
+    {
+      "name": "U15 Max",
+      "series": "U Series",
+      "overview": "Modular video splicer with up to 520 million pixels through 10G fiber, 472 million pixels through 5G Ethernet, or 262 million pixels through 1G Ethernet output boards.",
+      "max_width": 32768,
+      "max_height": 32768,
+      "max_frame_rate_hz": 240,
+      "max_color_depth_bpc": 10,
+      "outputs": [
+        { "mode": "1g", "ports": 400, "capacity_pixels": 262000000, "label": "1G Ethernet output boards" },
+        { "mode": "5g", "ports": 160, "capacity_pixels": 472000000, "label": "5G Ethernet output boards" },
+        { "mode": "10g", "ports": 80, "capacity_pixels": 520000000, "label": "10G fiber output boards" }
+      ],
+      "features": ["modular", "hdr", "low_latency", "redundancy", "monitoring", "multi_screen"]
+    },
+    {
+      "name": "U9 Max",
+      "series": "U Series",
+      "overview": "Modular video splicer for large LED projects with 10G fiber, 5G Ethernet, and 1G Ethernet output board options.",
+      "max_width": 32768,
+      "max_height": 32768,
+      "max_frame_rate_hz": 240,
+      "max_color_depth_bpc": 10,
+      "outputs": [
+        { "mode": "1g", "ports": 100, "capacity_pixels": 65000000, "label": "1G Ethernet output boards" },
+        { "mode": "5g", "ports": 80, "capacity_pixels": 236000000, "label": "5G Ethernet output boards" },
+        { "mode": "10g", "ports": 40, "capacity_pixels": 260000000, "label": "10G fiber output boards" }
+      ],
+      "features": ["modular", "hdr", "low_latency", "redundancy", "monitoring", "multi_screen"]
+    },
+    {
+      "name": "U6 Max",
+      "series": "U Series",
+      "overview": "Modular video splicer for medium and large projects with 10G fiber, 5G Ethernet, and 1G Ethernet output board options.",
+      "max_width": 32768,
+      "max_height": 32768,
+      "max_frame_rate_hz": 240,
+      "max_color_depth_bpc": 10,
+      "outputs": [
+        { "mode": "1g", "ports": 100, "capacity_pixels": 65000000, "label": "1G Ethernet output boards" },
+        { "mode": "5g", "ports": 40, "capacity_pixels": 118000000, "label": "5G Ethernet output boards" },
+        { "mode": "10g", "ports": 20, "capacity_pixels": 130000000, "label": "10G fiber output boards" }
+      ],
+      "features": ["modular", "hdr", "low_latency", "redundancy", "monitoring", "multi_screen"]
+    },
+    {
+      "name": "Z8t",
+      "series": "Z Series",
+      "overview": "Z8t (Specification V2.1): Modular chassis — up to 2 swappable input boards (choices include 2×HDMI 2.0, 2×DP 1.2, 2×12G-SDI, 3-in-1 HDMI 2.1+DP 1.4+12G-SDI, or ST2110) and up to 2 swappable output boards of the same type. Inputs up to 2×4K@60 per board, 23.98–240 Hz, 8/10/12-bit. Outputs to LED: either 5G Neutrik Ethernet (XFIPHX4V103: 4×5 Gb/s per board) or 10G optical fiber (XFIPHX4V102 2×fiber, XFIPHX4V107 4×fiber with primary/backup). Max load 23.59M pixels (16,384 px width). HDR10/HLG.",
+      "max_width": 16384,
+      "max_height": 8192,
+      "max_frame_rate_hz": 240,
+      "max_color_depth_bpc": 12,
+      "outputs": [
+        {
+          "mode": "5g",
+          "ports": 8,
+          "capacity_pixels": 23590000,
+          "label": "XFIPHX4V103: 4×5G Neutrik RJ45 per board (≤2 boards of same type)"
+        },
+        {
+          "mode": "10g",
+          "ports": 8,
+          "capacity_pixels": 23590000,
+          "label": "XFIPHX4V102 (2×10G fiber) or XFIPHX4V107 (4×10G fiber, 2+2 backup) per board (≤2 boards)"
+        }
+      ],
+      "features": ["modular", "hdr", "low_latency", "redundancy", "monitoring", "multi_screen"]
+    },
+    {
+      "name": "VX20",
+      "series": "VX Series",
+      "overview": "All-in-one video controller with 20 1G Ethernet output ports and 13 million pixels total load at 8-bit 60 Hz.",
+      "max_width": 16384,
+      "max_height": 8192,
+      "max_frame_rate_hz": 240,
+      "max_color_depth_bpc": 10,
+      "inputs": [
+        { "label": "2× HDMI 2.0" },
+        { "label": "4× HDMI 1.4" },
+        { "label": "2× DisplayPort 1.2" },
+        { "label": "2× 12G-SDI" }
+      ],
+      "outputs": [
+        { "mode": "1g", "ports": 20, "capacity_pixels": 13000000, "label": "20 x 1G Ethernet ports" }
+      ],
+      "features": ["redundancy", "low_latency"]
+    },
+    {
+      "name": "VX10",
+      "series": "VX Series",
+      "overview": "All-in-one video controller with 10 1G Ethernet output ports.",
+      "max_width": 8192,
+      "max_height": 8192,
+      "max_frame_rate_hz": 60,
+      "max_color_depth_bpc": 8,
+      "inputs": [
+        { "label": "1× HDMI 2.0" },
+        { "label": "1× HDMI 1.4 (with loop)" },
+        { "label": "2× DVI" },
+        { "label": "1× 3G-SDI (with loop)" }
+      ],
+      "outputs": [
+        { "mode": "1g", "ports": 10, "capacity_pixels": 6500000, "label": "10 x 1G Ethernet ports" },
+        { "mode": "10g", "ports": 1, "capacity_pixels": 6500000, "label": "1× 10G fiber (output to receiving cards)" }
+      ],
+      "features": ["low_latency"]
+    },
+    {
+      "name": "VX6",
+      "series": "VX Series",
+      "overview": "All-in-one video controller with 6 1G Ethernet output ports.",
+      "max_width": 8192,
+      "max_height": 8192,
+      "max_frame_rate_hz": 60,
+      "max_color_depth_bpc": 8,
+      "inputs": [
+        { "label": "1× HDMI 2.0" },
+        { "label": "1× HDMI 1.4 (with loop)" },
+        { "label": "2× DVI" },
+        { "label": "1× 3G-SDI (with loop)" }
+      ],
+      "outputs": [
+        { "mode": "1g", "ports": 6, "capacity_pixels": 3900000, "label": "6 x 1G Ethernet ports" },
+        { "mode": "10g", "ports": 1, "capacity_pixels": 3900000, "label": "1× 10G fiber (output to receiving cards)" }
+      ],
+      "features": ["low_latency"]
+    }
+  ]
+}

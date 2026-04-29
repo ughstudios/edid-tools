@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #f8fafc;
+  --foreground: #18181b;
+}
+
+.dark {
+  --background: #09090b;
+  --foreground: #f4f4f5;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+@layer components {
+  .panel-surface {
+    @apply border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950;
+  }
+
+  .input {
+    @apply min-h-10 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:focus:border-zinc-500 dark:focus:ring-zinc-800;
+  }
+
+  .repair-table {
+    @apply min-w-[1180px] w-full border-collapse text-sm;
+  }
+
+  .repair-table th {
+    @apply sticky top-0 z-10 border-b border-zinc-200 bg-zinc-100 px-2 py-2 text-left text-xs font-semibold uppercase text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300;
+  }
+
+  .repair-table td {
+    @apply border-b border-zinc-200 px-2 py-2 align-top dark:border-zinc-800;
+  }
+
+  .shell {
+    @apply grid min-h-screen grid-cols-[240px_minmax(0,1fr)] bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50 max-md:grid-cols-1;
+  }
+
+  .sidebar {
+    @apply border-r border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950 max-md:border-r-0 max-md:border-b;
+  }
+
+  .brand {
+    @apply mb-5 text-lg font-semibold tracking-tight;
+  }
+
+  .nav {
+    @apply grid gap-1 max-md:flex max-md:flex-wrap;
+  }
+
+  .nav a {
+    @apply rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50;
+  }
+
+  .main {
+    @apply min-w-0 p-5 md:p-6;
+  }
+
+  .panel {
+    @apply panel-surface rounded-xl p-4;
+  }
+
+  .toolbar {
+    @apply mb-4 flex flex-wrap items-end gap-3;
+  }
+
+  .field {
+    @apply grid gap-1 text-sm;
+  }
+
+  .field span {
+    @apply text-xs font-semibold uppercase text-zinc-500 dark:text-zinc-400;
+  }
+
+  .button {
+    @apply inline-flex min-h-10 items-center justify-center rounded-lg border border-zinc-900 bg-zinc-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-zinc-700 dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-300;
+  }
+
+  .button.secondary {
+    @apply border-zinc-300 bg-white text-zinc-800 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-zinc-900;
+  }
+
+  .button.danger {
+    @apply border-red-200 bg-white text-red-700 hover:bg-red-50 dark:border-red-900 dark:bg-zinc-950 dark:text-red-300 dark:hover:bg-red-950/40;
+  }
+
+  .table-wrap {
+    @apply overflow-auto rounded-lg border border-zinc-200 dark:border-zinc-800;
+  }
+
+  .cell-number {
+    @apply w-20;
+  }
+
+  .status {
+    @apply inline-flex rounded-full px-2 py-1 text-xs font-semibold;
+  }
+
+  .status.open {
+    @apply bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-200;
+  }
+
+  .status.in_progress {
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200;
+  }
+
+  .status.done {
+    @apply bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200;
+  }
+
+  .grid.cards {
+    @apply grid gap-4 sm:grid-cols-2 xl:grid-cols-4;
+  }
+
+  .grid.two-col {
+    @apply grid gap-4 lg:grid-cols-2;
+  }
+
+  .metric {
+    @apply panel-surface rounded-xl p-4;
+  }
+
+  .metric dt {
+    @apply text-xs font-semibold uppercase text-zinc-500 dark:text-zinc-400;
+  }
+
+  .metric dd {
+    @apply mt-2 text-3xl font-semibold tabular-nums;
+  }
+
+  .list {
+    @apply mt-3 grid gap-2;
+  }
+
+  .list li {
+    @apply flex items-center justify-between gap-3 border-b border-zinc-200 py-2 text-sm last:border-b-0 dark:border-zinc-800;
+  }
+
+  .muted {
+    @apply text-zinc-500 dark:text-zinc-400;
+  }
+}

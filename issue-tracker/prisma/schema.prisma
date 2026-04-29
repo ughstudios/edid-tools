@@ -1,0 +1,402 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  /// Pooled Neon URL (e.g. host `…-pooler…`) for the app at runtime.
+  url       = env("DATABASE_URL")
+  /// Non-pooled URL for `prisma migrate deploy` (advisory locks + pooler often cause P1002 timeouts).
+  directUrl = env("DATABASE_DIRECT_URL")
+}
+
+model User {
+  id                    String    @id @default(cuid())
+  name                  String
+  email                 String    @unique
+  passwordHash          String
+  role                  String    @default("EMPLOYEE")
+  approvalStatus        String    @default("APPROVED")
+  approvedAt            DateTime?
+  /// Set when the user finishes or skips the first-login onboarding tour (server-side).
+  onboardingCompletedAt DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  issueAssignments                   IssueAssignment[]
+  createdIssues                      Issue[]                            @relation("IssueReporter")
+  issueThreadEntries                 IssueThreadEntry[]                 @relation("IssueThreadAuthor")
+  uploadedProjectAttachments         ProjectAttachment[]                @relation("ProjectAttachmentUploader")
+  uploadedCustomerAttachments        CustomerAttachment[]               @relation("CustomerAttachmentUploader")
+  uploadedIssueAttachments           IssueAttachment[]                  @relation("IssueAttachmentUploader")
+  uploadedIssueThreadAttachments     IssueThreadAttachment[]            @relation("IssueThreadAttachmentUploader")
+  projectNotes                       ProjectNote[]                      @relation("ProjectNoteAuthor")
+  auditLogs                          AuditLog[]                         @relation("AuditLogActor")
+  workRecords                        WorkRecord[]
+  publicCustomerRequestThreadEntries PublicCustomerRequestThreadEntry[] @relation("PublicCustomerRequestThreadAuthor")
+  assignedPublicCustomerRequests     PublicCustomerRequest[]            @relation("PublicCustomerRequestAssignee")
+}
+
+enum PublicCustomerRequestKind {
+  CALIBRATION
+  PROCESSOR_RMA
+}
+
+/// Staff workflow for public calibration / processor RMA submissions (submissionId matches AuditLog.entityId).
+model PublicCustomerRequest {
+  submissionId     String                    @id
+  kind             PublicCustomerRequestKind
+  /// PENDING | IN_PROGRESS | CLOSED
+  status           String                    @default("PENDING")
+  /// Set when status becomes CLOSED; used for 24h auto-archive (same pattern as issues doneAt).
+  closedAt         DateTime?
+  archivedAt       DateTime?
+  sourceAuditLogId String?
+  assigneeId       String?
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+
+  assignee      User?                              @relation("PublicCustomerRequestAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  threadEntries PublicCustomerRequestThreadEntry[]
+
+  @@index([archivedAt, createdAt])
+  @@index([status, closedAt, archivedAt])
+  @@index([assigneeId])
+}
+
+model PublicCustomerRequestThreadEntry {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  submissionId String
+  request      PublicCustomerRequest @relation(fields: [submissionId], references: [submissionId], onDelete: Cascade)
+  authorId     String
+  author       User                  @relation("PublicCustomerRequestThreadAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([submissionId, createdAt])
+}
+
+model WorkRecord {
+  id        String   @id @default(cuid())
+  workDate  DateTime
+  title     String   @default("")
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, workDate])
+}
+
+model Customer {
+  id         String    @id @default(cuid())
+  name       String    @unique
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  projects    Project[]
+  issues      Issue[]
+  attachments CustomerAttachment[]
+  contacts    CustomerContact[]
+}
+
+model CustomerContact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @default("")
+  phone     String   @default("")
+  title     String   @default("")
+  notes     String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([email])
+}
+
+model Project {
+  id         String    @id @default(cuid())
+  name       String    @unique
+  product    String
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Restrict)
+
+  issues              Issue[]
+  processorConfigs    ProjectProcessorConfig[]
+  receiverCardConfigs ProjectReceiverCardConfig[]
+  otherProductConfigs ProjectOtherProductConfig[]
+  attachments         ProjectAttachment[]
+  notes               ProjectNote[]
+}
+
+model ProjectProcessorConfig {
+  id        String   @id @default(cuid())
+  model     String
+  firmware  String
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectReceiverCardConfig {
+  id        String   @id @default(cuid())
+  model     String
+  version   String
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectOtherProductConfig {
+  id        String   @id @default(cuid())
+  category  String
+  model     String
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+enum WarehouseItemKind {
+  PROCESSOR
+  RECEIVER_CARD
+  OTHER
+}
+
+/// On-hand warehouse stock for processors, receiver cards, and other products (same dimensions as project wizard).
+model WarehouseStockLine {
+  id              String            @id @default(cuid())
+  kind            WarehouseItemKind
+  model           String
+  firmware        String            @default("")
+  receiverVersion String            @default("")
+  category        String            @default("")
+  quantity        Int
+  notes           String?
+  location        String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([kind, model, firmware, receiverVersion, category])
+  @@index([kind])
+}
+
+model ProjectAttachment {
+  id         String   @id @default(cuid())
+  fileName   String
+  fileUrl    String
+  fileType   String
+  fileSize   Int
+  uploadNote String   @default("")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  projectId  String
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  uploaderId String?
+  uploader   User?   @relation("ProjectAttachmentUploader", fields: [uploaderId], references: [id], onDelete: SetNull)
+
+  @@index([fileUrl])
+}
+
+model CustomerAttachment {
+  id         String   @id @default(cuid())
+  fileName   String
+  fileUrl    String
+  fileType   String
+  fileSize   Int
+  uploadNote String   @default("")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  uploaderId String?
+  uploader   User?    @relation("CustomerAttachmentUploader", fields: [uploaderId], references: [id], onDelete: SetNull)
+
+  @@index([customerId])
+  @@index([fileUrl])
+}
+
+model ProjectNote {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User    @relation("ProjectNoteAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  entityType  String
+  entityId    String
+  action      String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  actorId String?
+  actor   User?   @relation("AuditLogActor", fields: [actorId], references: [id], onDelete: SetNull)
+}
+
+model IssueAssignment {
+  issueId String
+  userId  String
+  issue   Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([issueId, userId])
+  @@index([userId])
+}
+
+model Issue {
+  id                 String    @id @default(cuid())
+  title              String
+  titleTranslated    String?
+  status             String    @default("OPEN")
+  symptom            String
+  symptomTranslated  String?
+  cause              String
+  causeTranslated    String?
+  solution           String
+  solutionTranslated String?
+  contentLanguage    String?
+  rndContact         String
+  doneAt             DateTime?
+  archivedAt         DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  projectId  String?
+  customerId String?
+  reporterId String
+
+  project       Project?           @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  customer      Customer?          @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  reporter      User               @relation("IssueReporter", fields: [reporterId], references: [id], onDelete: Restrict)
+  assignments   IssueAssignment[]
+  threadEntries IssueThreadEntry[]
+  attachments   IssueAttachment[]
+}
+
+model IssueThreadEntry {
+  id                String   @id @default(cuid())
+  content           String
+  contentTranslated String?
+  contentLanguage   String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  issueId     String
+  issue       Issue                   @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  authorId    String
+  author      User                    @relation("IssueThreadAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  attachments IssueThreadAttachment[]
+}
+
+model IssueAttachment {
+  id         String   @id @default(cuid())
+  fileName   String
+  fileUrl    String
+  fileType   String
+  fileSize   Int
+  uploadNote String   @default("")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  issueId    String
+  issue      Issue   @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  uploaderId String?
+  uploader   User?   @relation("IssueAttachmentUploader", fields: [uploaderId], references: [id], onDelete: SetNull)
+
+  @@index([issueId])
+  @@index([fileUrl])
+}
+
+model IssueThreadAttachment {
+  id         String   @id @default(cuid())
+  fileName   String
+  fileUrl    String
+  fileType   String
+  fileSize   Int
+  uploadNote String   @default("")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  threadEntryId String
+  threadEntry   IssueThreadEntry @relation(fields: [threadEntryId], references: [id], onDelete: Cascade)
+  uploaderId    String?
+  uploader      User?            @relation("IssueThreadAttachmentUploader", fields: [uploaderId], references: [id], onDelete: SetNull)
+
+  @@index([threadEntryId])
+  @@index([fileUrl])
+}
+
+/// Temporary staging for same-origin → Blob relay (custom domains: browser cannot call vercel.com/api/blob).
+model BlobRelayUpload {
+  id           String   @id @default(cuid())
+  userId       String
+  pathname     String
+  contentType  String   @default("application/octet-stream")
+  totalSize    Int
+  received     Int      @default(0)
+  nextChunkSeq Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  chunks BlobRelayChunk[]
+
+  @@index([userId, createdAt])
+}
+
+model BlobRelayChunk {
+  id        String   @id @default(cuid())
+  sessionId String
+  seq       Int
+  /// Temporary Vercel Blob URL for this chunk (payload is not stored in Postgres).
+  partUrl   String
+  createdAt DateTime @default(now())
+
+  session BlobRelayUpload @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, seq])
+  @@index([sessionId])
+}
+
+/// Singleton-style app configuration (id is always "default").
+model AppSettings {
+  id                String   @id @default("default")
+  /// Per main nav area: when false, employees cannot open that page or related APIs. Missing keys default to allowed.
+  employeeNavAccess Json     @default("{}")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}

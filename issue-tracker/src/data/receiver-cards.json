@@ -1,0 +1,70 @@
+{
+  "cards": [
+    {
+      "name": "K8",
+      "series": "K Series",
+      "performance": {
+        "control_area_per_card": "512 x 384"
+      },
+      "hardware": {
+        "transmission_rate": "1G"
+      },
+      "comparison_features": {
+        "loading_capacity": "512 x 384",
+        "color_depth": "12 bit",
+        "dynamic_frame_rate": "120 Hz",
+        "data_group": "32",
+        "hdr": true,
+        "low_latency": true,
+        "loop_backup": true,
+        "receiving_card_backup": true,
+        "cabinet_monitoring": true,
+        "network_cable_detection": true
+      }
+    },
+    {
+      "name": "HC5",
+      "series": "HC Series",
+      "performance": {
+        "control_area_per_card": "1024 x 768"
+      },
+      "hardware": {
+        "transmission_rate": "5G"
+      },
+      "comparison_features": {
+        "loading_capacity": "1024 x 768",
+        "color_depth": "12 bit",
+        "dynamic_frame_rate": "120 Hz",
+        "data_group": "64",
+        "hdr": true,
+        "low_latency": true,
+        "loop_backup": true,
+        "receiving_card_backup": true,
+        "cabinet_monitoring": true,
+        "network_cable_detection": true
+      }
+    },
+    {
+      "name": "RV5000",
+      "series": "RV Series",
+      "performance": {
+        "control_area_per_card": "1024 x 768"
+      },
+      "hardware": {
+        "transmission_rate": "5G"
+      },
+      "comparison_features": {
+        "loading_capacity": "1024 x 768",
+        "color_depth": "12 bit",
+        "dynamic_frame_rate": "120 Hz",
+        "data_group": "64",
+        "hdr": true,
+        "low_latency": true,
+        "loop_backup": true,
+        "receiving_card_backup": true,
+        "cabinet_monitoring": true,
+        "network_cable_detection": true
+      }
+    }
+  ]
+}
